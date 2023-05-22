@@ -970,3 +970,173 @@ int main() {
 }
 ```
 
+## 函数
+
+### 1
+
+编写一个函数，实现两个整数的交换，要求采用指针的方式实现。
+
+```cpp
+void swapIntegers(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+int main() {
+    int num1 = 5;
+    int num2 = 10;
+    std::cout << "Before swapping: num1 = " << num1 << ", num2 = " << num2 << std::endl;
+    // 注意参数传入的方式：
+    swapIntegers(&num1, &num2);
+    std::cout << "After swapping: num1 = " << num1 << ", num2 = " << num2 << std::endl;
+    return 0;
+}
+```
+
+在函数调用 `swapIntegers(&num1, &num2);` 中，使用取地址运算符 `&` 可以获取变量 `num1` 和 `num2` 的内存地址。这些地址作为参数传递给 `swapIntegers` 函数，使函数能够操作这些地址所对应的变量。
+
+函数 `swapIntegers` 的参数类型是指针类型 `int*`，它接收两个指向整数的指针作为参数。通过传递 `&num1` 和 `&num2`，实际上将 `num1` 和 `num2` 的地址传递给了 `swapIntegers` 函数。
+
+因此，通过将变量地址作为参数传递给函数，并在函数内部通过指针操作变量，可以实现变量的交换操作。
+
+### find()
+
+在 C++ 中，`find()` 函数用于在容器（如字符串、向量、列表、集合等）中查找特定元素的位置。它返回一个迭代器，指向找到的元素，如果未找到，则返回容器的结束迭代器。
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // 在向量中查找元素 3
+    auto it = std::find(numbers.begin(), numbers.end(), 3);
+    // 需要注意的是，numbers.end() 返回的迭代器指向的是容器的尾后位置，而不是最后一个元素。因此，在使用算法函数时，通常将 end() 迭代器作为查找操作的终止条件，表示已经遍历完容器的所有元素。
+
+    // 检查是否找到
+    if (it != numbers.end()) {
+        std::cout << "元素 3 在向量中的位置：" << std::distance(numbers.begin(), it) << std::endl;
+    } else {
+        std::cout << "元素 3 未找到" << std::endl;
+    }
+
+    return 0;
+}
+```
+
+在上面的示例中，我们使用 `std::find()` 函数在整数向量 `numbers` 中查找元素 3。如果找到了元素，则输出其位置；如果未找到，则输出未找到的消息。
+
+请注意，`std::find()` 函数需要包含 `<algorithm>` 头文件。它是 C++ 标准库中的算法之一，可以应用于各种容器类型。根据需要，你可以将其应用于不同的容器和元素类型。
+
+### 2
+
+寻找子字符串出现的次数
+
+```cpp
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main() {
+
+    char str[100] = { 0 };
+    char substr[100] = { 0 };
+
+    cin.getline(str, sizeof(str));
+    cin.getline(substr, sizeof(substr));
+
+    int count = 0;
+
+    //转化为字符串
+    string str1(str);
+    string str2(substr);
+    
+    int i=0;
+    //从str1下标i开始查找str2，注意
+    while(str1.find(str2,i)!=-1){
+        //如果找得到，计数加1
+        count++;
+        //i从找到的位置，后移一位
+        i=str1.find(str2,i)+1;
+    }
+
+    cout << count << endl;
+
+    return 0;
+}
+```
+
+`str1.find(str2, i)` 用于在字符串 `str1` 中从位置 `i` 开始查找子字符串 `str2`。如果找到了子字符串，则返回子字符串的起始位置；如果找不到，则返回 `string::npos`，即一个特殊的无效位置标识。
+
+在C++中，`string::find()` 函数如果找不到指定的子字符串，会返回 `string::npos`，而不是返回 `-1`。
+
+但是-1也过了，还是写string::npos吧。
+
+### strlen()
+
+在C++中，函数 `strlen()` 是用于计算字符串的长度的，但是它是针对以空字符（`'\0'`）结尾的字符数组（C风格字符串）的。
+
+如果你的字符串 `str` 是 `std::string` 类型的对象，应该使用 `str.length()` 或 `str.size()` 来获取字符串的长度，而不是使用 `strlen()` 函数。
+
+如果你的字符串 `str` 是以空字符结尾的字符数组（C风格字符串），则可以使用 `strlen()` 函数计算其长度。但需要确保你已经包含了正确的头文件 `<cstring>`，其中包含了 `strlen()` 函数的声明。
+
+请检查你的代码，确保你使用了正确的字符串类型和相关的头文件。如果问题仍然存在，请提供更多的代码和错误信息，以便我能够帮助你更准确地解决问题。
+
+### 3 引用
+
+就是加上了引用符号然后正常处理
+
+引用的方式交换两个数
+
+```cpp
+#include <iostream>
+using namespace std;
+void swap(int &m, int &n){ //交换两个整数的函数，用引用
+    int temp = m; //交换两个数
+    m = n;
+    n = temp;
+}
+int main() {
+	int m, n;
+	cin >> m;
+	cin >> n;
+    // 调用的时候不需要&引用符号
+    swap(m, n); //函数交换
+	cout << m << " " << n << endl;
+	return 0;
+}
+```
+
+引用参数是一种函数参数传递的机制，它允许函数直接访问并修改传递给它的变量，而无需通过指针或副本进行操作。通过引用参数，可以在函数内部修改传入的变量，并使得修改在函数外部也可见。
+
+在C++中，引用参数使用引用符号 `&` 来声明。通过将变量作为引用参数传递给函数，函数可以直接访问并修改原始变量的值，而不是对变量进行复制或创建副本。
+
+引用参数的优点包括：
+
+1. 避免了在函数调用时创建副本，提高了程序的效率。
+2. 允许函数修改原始变量的值，使得函数的影响在函数外部可见。
+3. 代码更加简洁和易读，不需要使用指针操作或返回值来实现修改。
+
+以下是一个使用引用参数的示例：
+
+```cpp
+void increment(int& num) {
+    num++; // 修改传入的变量的值
+}
+
+int main() {
+    int num = 10;
+
+    increment(num);
+
+    cout << num; // 输出 11
+
+    return 0;
+}
+```
+
+在上述示例中，`increment` 函数接受一个整数的引用参数 `num`，并将其值加一。通过在 `main` 函数中调用 `increment(num)`，函数直接修改了 `num` 变量的值，使得修改在 `main` 函数中可见，输出结果为 11。
+
+### 打印乘法表
