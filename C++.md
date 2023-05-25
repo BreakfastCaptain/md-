@@ -1140,3 +1140,28 @@ int main() {
 在上述示例中，`increment` 函数接受一个整数的引用参数 `num`，并将其值加一。通过在 `main` 函数中调用 `increment(num)`，函数直接修改了 `num` 变量的值，使得修改在 `main` 函数中可见，输出结果为 11。
 
 ### 打印乘法表
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    
+    int n;
+    cin >> n;
+
+    //i表示乘法表行数.
+    for(int i=1;i<=n;i++){
+        //j表示乘法表列数
+        for(int j=1;j<=i;j++){
+            //按对应格式输出乘法表
+            cout<<j<<" * "<<i<<" = "<<j*i<<"    ";
+        }
+        //每打印完一行，进行换行
+        cout<<endl;
+    }
+
+    return 0;
+}
+```
+
