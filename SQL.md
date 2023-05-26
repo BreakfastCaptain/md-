@@ -456,3 +456,265 @@ FROM Orders
 ORDER BY total_ordered DESC
 ```
 
+## 牛客非技术快速入门
+
+### 查询去重
+
+**distinct**
+
+```sql
+select distinct university from user_profile;
+```
+
+### LIMIT
+
+select device_id from user_profile limit 0,2---运行效率更高
+
+select device_id from user_profile limit 2 ---运行效率低
+
+也可结合 limit offset： 一起使用时，limit表示要取的数量，offset表示跳过的数量
+
+select device_id from user_profile limit 2 offset 0 // 跳过0条，从第一条数据开始取，取两条数据 ---运行效率中
+
+### 多列排序级别
+
+```sql
+select
+    device_id,
+    gpa,
+    age
+from user_profile
+order by gpa,age
+# 先按照gpa升序排序，再按照年龄升序排序输出
+```
+
+
+
+### 查找区间区间
+
+不能连续大小判断
+
+```sql
+SELECT device_id, gender, age
+FROM user_profile
+WHERE age>=20&&age<=23;
+
+SELECT device_id, gender, age
+FROM user_profile
+WHERE age>=20 AND age<=23;
+
+SELECT device_id, gender, age
+FROM user_profile
+WHERE age BETWEEN 20 AND 23;
+```
+
+### 过滤空值
+
+```sql
+select device_id,gender,age,university
+from user_profile
+where age is not NULL;
+
+select device_id,gender,age,university
+from user_profile
+where age !='';
+```
+
+### 增加复用性in
+
+```sql
+select device_id,gender,age,university,gpa from user_profile
+where university in('北京大学','复旦大学','山东大学');
+```
+
+### 模糊匹配
+
+一般形式为：
+
+列名 [NOT ] LIKE
+
+**匹配串中可包含如下四种通配符：**
+**_：匹配任意一个字符；**
+**%：匹配0个或多个字符；**
+**[ ]：匹配[ ]中的任意一个字符(若要比较的字符是连续的，则可以用连字符“-”表 达 )；**
+**[ ^  ]：不匹配[ ]中的任意一个字符。**
+
+例23．查询学生表中姓‘张’的学生的详细信息。
+
+```
+SELECT` `* ``FROM` `学生表 ``WHERE` `姓名 ``LIKE` `‘张%’
+```
+
+例24．查询姓“张”且名字是3个字的学生姓名。
+
+```
+SELECT` `* ``FROM` `学生表 ``WHERE` `姓名 ``LIKE` `'张__’
+```
+
+如果把姓名列的类型改为nchar(20)，在SQL Server 2012中执行没有结果。原因是姓名列的类型是char(20)，当姓名少于20个汉字时，系统在存储这些数据时自动在后边补空格，空格作为一个字符，也参加LIKE的比较。可以用rtrim()去掉右空格。
+
+```
+SELECT` `* ``FROM` `学生表 ``WHERE` `rtrim(姓名) ``LIKE` `'张__'
+```
+
+例25.查询学生表中姓‘张’、姓‘李’和姓‘刘’的学生的情况。
+
+```
+SELECT` `* ``FROM` `学生表 ``WHERE` `姓名 ``LIKE` `'[张李刘]%’
+```
+
+例26.查询学生表表中名字的第2个字为“小”或“大”的学生的姓名和学号。
+
+```
+SELECT` `姓名,学号 ``FROM` `学生表 ``WHERE` `姓名 ``LIKE` `'_[小大]%'
+```
+
+例27.查询学生表中所有不姓“刘”的学生。
+
+```
+SELECT` `姓名 ``FROM` `学生 ``WHERE` `姓名 ``NOT` `LIKE` `'刘%’
+```
+
+例28.从学生表表中查询学号的最后一位不是2、3、5的学生信息。
+
+```
+SELECT` `* ``FROM` `学生表 ``WHERE` `学号 ``LIKE` `'%[^235]'
+```
+
+### 寻找最大值
+
+```sql
+select gpa from user_profile
+WHERE university='复旦大学'
+order by gpa desc limit 1;
+
+select max(gpa )
+from user_profile
+WHERE university='复旦大学'
+```
+
+### 计算数量和平均值
+
+```sql
+select 
+  count(gender) as male_num,
+  round(avg(gpa), 1) as avg_gpa
+from user_profile where gender="male";
+```
+
+### 分组计算
+
+```sql
+select 
+    gender, university,
+    count(device_id) as user_num,
+    avg(active_days_within_30) as avg_active_days,
+    avg(question_cnt) as avg_question_cnt
+from user_profile
+group by gender, university
+```
+
+由表格：
+
+| id   | device_id | gender | age  | university | gpa  | active_days_within_30 | question_cnt | answer_cnt |
+| ---- | --------- | ------ | ---- | ---------- | ---- | --------------------- | ------------ | ---------- |
+| 1    | 2138      | male   | 21   | 北京大学   | 3.4  | 7                     | 2            | 12         |
+| 2    | 3214      | male   |      | 复旦大学   | 4.0  | 15                    | 5            | 25         |
+| 3    | 6543      | female | 20   | 北京大学   | 3.2  | 12                    | 3            | 30         |
+| 4    | 2315      | female | 23   | 浙江大学   | 3.6  | 5                     | 1            | 2          |
+| 5    | 5432      | male   | 25   | 山东大学   | 3.8  | 20                    | 15           | 70         |
+| 6    | 2131      | male   | 28   | 山东大学   | 3.3  | 15                    | 7            | 13         |
+| 7    | 4321      | male   | 26   | 复旦大学   | 3.6  | 9                     | 6            | 52         |
+
+生成：
+
+| gender | university | user_num | avg_active_day | avg_question_cnt |
+| ------ | ---------- | -------- | -------------- | ---------------- |
+| male   | 北京大学   | 1        | 7.0            | 2.0              |
+| male   | 复旦大学   | 2        | 12.0           | 5.5              |
+| female | 北京大学   | 1        | 12.0           | 3.0              |
+| female | 浙江大学   | 1        | 5.0            | 1.0              |
+| male   | 山东大学   | 2        | 17.5           | 11.0             |
+
+### 分组过滤
+
+请取出平均发贴数低于5的学校或平均回帖数小于20的学校。
+
+生成：
+
+| university | avg_question_cnt | avg_answer_cnt |
+| ---------- | ---------------- | -------------- |
+| 北京大学   | 2.5000           | 21.000         |
+| 浙江大学   | 1.000            | 2.000          |
+
+```sql
+select
+    university,
+    avg(question_cnt) as avg_question_cnt,
+    avg(answer_cnt) as avg_answer_cnt
+from user_profile
+group by university
+# 最后这里 having没写出
+having avg_question_cnt<5 or avg_answer_cnt<20
+```
+
+### HAVING
+
+HAVING 子句用于在执行聚合查询（如 GROUP BY）后对结果进行过滤。它允许您根据聚合函数的结果对结果集进行条件筛选。
+
+以下是 HAVING 子句的基本用法：
+
+1. 聚合查询：
+   首先，使用 GROUP BY 子句对数据进行分组，并应用一个或多个聚合函数（如 COUNT、SUM、AVG）来计算每个组的结果。
+
+   例如：
+
+   ```SQL
+   SELECT category, COUNT(*) as count
+   FROM products
+   GROUP BY category;
+   ```
+
+   在上述查询中，通过使用 GROUP BY 子句，将 "products" 表中的数据按照 "category" 列进行分组，并计算每个组的记录数量。
+
+2. 过滤结果：
+   在聚合查询的结果上，使用 HAVING 子句来指定筛选条件。HAVING 子句使用聚合函数的结果进行比较。
+
+   例如：
+
+   ```SQL
+   SELECT category, COUNT(*) as count
+   FROM products
+   GROUP BY category
+   HAVING COUNT(*) > 5;
+   ```
+
+   在上述查询中，通过在 HAVING 子句中指定条件 "COUNT(*) > 5"，只返回具有记录数量大于 5 的组。
+
+请注意，**HAVING 子句在执行 GROUP BY 后应用筛选，而 WHERE 子句在执行 GROUP BY 之前进行筛选**。因此，HAVING 子句可以用于对聚合结果进行更细粒度的过滤。
+
+另外，HAVING 子句可以使用其他运算符和函数来构建更复杂的条件筛选，类似于 WHERE 子句的用法。
+
+
+
+### CASE
+
+```SQL
+CASE 测试表达式
+WHEN 简单表达式1 THEN 结果表达式1
+WHEN 简单表达式2 THEN 结果表达式2 …
+WHEN 简单表达式n THEN 结果表达式n
+[ ELSE 结果表达式n+1 ]
+END
+```
+
+例子：现在运营想要将用户划分为25岁以下和25岁及以上两个年龄段，分别查看这两个年龄段用户数量 -本题注意：age为null 也记为 25岁以下
+
+```sql
+SELECT CASE WHEN age < 25 OR age IS NULL THEN '25岁以下' 
+            WHEN age >= 25 THEN '25岁及以上'
+            END AS age_cut,  COUNT(*)number
+FROM user_profile
+GROUP BY age_cut
+```
+
